@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard API ATEI BARTIM💫(Web QR Sync)</title>
+    <title>Dashboard API ATEI BARTIM v7</title>
     <style>
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f1f5f9; color: #1e293b; margin: 16px; }
         .container { max-width: 960px; margin: auto; }
@@ -18,8 +18,6 @@
         label { display: block; font-weight: 600; font-size: 13px; margin-bottom: 4px; color: #334155; }
         input[type="text"], input[type="number"] { width: 100%; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 5px; box-sizing: border-box; font-size: 14px; }
         input[readonly] { background-color: #f8fafc; color: #475569; font-weight: 600; }
-        .checkbox-row { display: flex; align-items: center; gap: 8px; margin: 10px 0; font-size: 13px; font-weight: 600; color: #1e3a8a; }
-        .checkbox-row input { width: auto; transform: scale(1.15); }
         button { background: #2563eb; color: #fff; border: none; padding: 9px 15px; border-radius: 5px; cursor: pointer; font-weight: 600; font-size: 13px; margin-top: 4px; margin-right: 6px; }
         button:hover { background: #1e40af; }
         .btn-green { background: #059669; }
@@ -35,7 +33,6 @@
         .btn-red { background: #dc2626; padding: 6px 12px; font-size: 12px; margin: 0; }
         .btn-red:hover { background: #b91c1c; }
 
-        /* HEADER & KOTAK KONSOL TERPISAH */
         .console-wrapper { margin-bottom: 20px; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.12); }
         .console-header { background: #1e293b; color: #f8fafc; padding: 10px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #334155; }
         .console-header strong { font-size: 13px; font-family: 'Consolas', monospace; color: #e2e8f0; }
@@ -46,15 +43,15 @@
 <body>
 
 <div class="container">
-    <h1>🛠 Dasbor API ATEI BARTIM (Web QR Sync)</h1>
+    <h1>🛠 Dasbor API ATEI BARTIM v7</h1>
     <div class="subtitle">
-        API: <code>https://api-absen.baritotimurkab.go.id</code> | 
+        API: <code>https://api-absen.baritotimurkab.go.id/public/api</code> | 
         Tanggal Otomatis: <span class="badge-date" id="displayTanggal"></span>
     </div>
 
     <!-- KONFIGURASI HEADER & AUTENTIKASI -->
     <div class="card config-card">
-        <h2>🔑 Konfigurasi Token, URL Web QR & Header Perangkat</h2>
+        <h2>🔑 Konfigurasi Token, Device ID & Web QR</h2>
         <div class="row">
             <div class="form-group">
                 <label>Base URL API</label>
@@ -70,23 +67,30 @@
             </div>
         </div>
         <div class="form-group">
-            <label>URL Lengkap Web QR Server (Otomatis dari ID Unit)</label>
+            <label>URL Web QR Server (Wajib Login Web Dahulu)</label>
             <input type="text" id="qrFullUrl" value="https://presensi.baritotimurkab.go.id/get_qr/31">
         </div>
         <div class="form-group">
-            <label>Authorization Bearer Token</label>
-            <input type="text" id="bearerToken" value="jk6A31UPaZIDiR7LeFqPV5OaUdrbybDa2JUiRtiE6a977c9f">
+            <label>Authorization Bearer Token (API Mobile)</label>
+            <input type="text" id="bearerToken" value="419607|jk6A31UPaZIDiR7LeFqPV5OaUdrbybDa2JUiRtiE6a977c9f">
         </div>
         <div class="row">
             <div class="form-group">
-                <label>x-device-id</label>
+                <label>x-device-id (Aktif untuk API)</label>
                 <input type="text" id="deviceId" value="9A16C2806C859095">
+            </div>
+            <div class="form-group">
+                <label>Web device_id (Local Storage Login)</label>
+                <input type="text" id="webDeviceId" value="4ca74db83820d5de7a43991e5f75a1ba">
             </div>
             <div class="form-group">
                 <label>x-install-id</label>
                 <input type="text" id="installId" value="761392668472996190bfbe472b50c9b1626f413f41901ad8">
             </div>
         </div>
+        <button type="button" class="btn-gray" onclick="pakaiDeviceAndroid()">Gunakan Device ID Android</button>
+        <button type="button" class="btn-gray" onclick="pakaiDeviceWeb()">Gunakan Device ID Web</button>
+        <button type="button" class="btn-cyan" onclick="salinScriptConsole()">📋 Salin Script Ambil QR (Untuk Console Web)</button>
     </div>
 
     <!-- KONSOL LOG RESPON -->
@@ -95,7 +99,7 @@
             <strong>[Konsol Output API]</strong>
             <button type="button" class="btn-red" onclick="clearConsole()">Bersihkan Konsol</button>
         </div>
-        <div class="console" id="consoleBox">Siap mengambil QR dari presensi.baritotimurkab.go.id/get_qr/31...</div>
+        <div class="console" id="consoleBox">Siap. Gunakan tombol "Salin Script Ambil QR" di tab presensi.baritotimurkab.go.id setelah login, atau tempel token QR secara manual.</div>
     </div>
 
     <!-- 1. VERIFIKASI LOKASI, QR CHECK-IN & QR CHECK-OUT -->
@@ -117,7 +121,7 @@
                 <input type="text" id="autoTanggal" readonly>
             </div>
             <div class="form-group">
-                <label>Token Hash QR (Otomatis dari Server)</label>
+                <label>Token Hash QR (Tempel Hasil QR / Otomatis)</label>
                 <input type="text" id="qrHash" value="34a08fca2e" oninput="updatePreviewQr()">
             </div>
         </div>
@@ -132,12 +136,7 @@
             </div>
         </div>
 
-        <div class="checkbox-row">
-            <input type="checkbox" id="autoFetchQr" checked>
-            <label for="autoFetchQr" style="margin:0; cursor:pointer;">Otomatis tarik token QR terbaru dari server sebelum kirim Check-In / Check-Out</label>
-        </div>
-
-        <button type="button" class="btn-cyan" onclick="ambilQrServer()">🔄 Ambil QR Server (/get_qr)</button>
+        <button type="button" class="btn-cyan" onclick="tempelQrClipboard()">📥 Tempel Token QR dari Clipboard</button>
         <button type="button" class="btn-gray" onclick="ambilGpsAsli()">📍 Ambil GPS Browser</button>
         <button type="button" class="btn-amber" onclick="verifikasiLokasi()">1. Verifikasi Lokasi (/user/verifikasi_loc)</button>
         <button type="button" class="btn-green" onclick="kirimQrIn()">2. Kirim QR Check-In (/user/qr_in)</button>
@@ -189,7 +188,6 @@ function updateQrUrl() {
 function updatePreviewQr() {
     const tglStr = getTanggalHariIni();
     let hash = val('qrHash');
-    // Jika token server berformat YYYY-MM-DDxxxxxxxxxx, ambil bagian hash akhirnya
     if (/^\d{4}-\d{2}-\d{2}/.test(hash)) {
         hash = hash.slice(10);
         document.getElementById('qrHash').value = hash;
@@ -212,6 +210,39 @@ function sinkronTanggalOtomatis() {
 }
 
 sinkronTanggalOtomatis();
+
+function pakaiDeviceAndroid() {
+    document.getElementById('deviceId').value = '9A16C2806C859095';
+    log('🔄 x-device-id diubah ke ID Android: 9A16C2806C859095');
+}
+
+function pakaiDeviceWeb() {
+    document.getElementById('deviceId').value = val('webDeviceId');
+    log(`🔄 x-device-id diubah ke ID Web: ${val('webDeviceId')}`);
+}
+
+function salinScriptConsole() {
+    const unitId = val('qrUnitId') || '31';
+    const script = `fetch('/get_qr/${unitId}').then(r=>r.text()).then(t=>{const m=t.match(/\d{4}-\d{2}-\d{2}[a-zA-Z0-9]{8,20}/);const h=m?m[0]:t.trim();navigator.clipboard?.writeText(h);alert('Token QR Tersalin:\n'+h);});`;
+    navigator.clipboard?.writeText(script);
+    log(`📋 Script Console tersalin ke clipboard!
+1. Buka tab presensi.baritotimurkab.go.id (setelah login)
+2. Tempel di DevTools Console lalu tekan Enter
+3. Kembali ke sini dan klik "Tempel Token QR dari Clipboard".`);
+}
+
+async function tempelQrClipboard() {
+    try {
+        const text = await navigator.clipboard.readText();
+        if (text) {
+            document.getElementById('qrHash').value = text.trim();
+            updatePreviewQr();
+            log(`✅ Token QR dari clipboard diterapkan: ${val('qrInPreview')}`);
+        }
+    } catch (e) {
+        log(`⚠️ Gagal membaca clipboard otomatis. Silakan tempel manual pada kolom "Token Hash QR".`);
+    }
+}
 
 function log(msg) {
     const box = document.getElementById('consoleBox');
@@ -239,59 +270,6 @@ function getHeaders(withAuth = true) {
         headers['Authorization'] = `Bearer ${val('bearerToken')}`;
     }
     return headers;
-}
-
-// Mengambil token QR terbaru langsung dari presensi.baritotimurkab.go.id/get_qr/{unitId}
-async function ambilQrServer() {
-    const url = val('qrFullUrl');
-    log(`🔄 Mengambil token QR terbaru dari:
-${url}`);
-
-    try {
-        const res = await fetch(url, {
-            method: 'GET',
-            headers: { 'Accept': 'application/json, text/html, */*' }
-        });
-        const rawText = await res.text();
-        log(`⬅️ HTTP ${res.status} (Respon Web QR):
-${rawText.substring(0, 500)}${rawText.length > 500 ? '...(dipotong)' : ''}`);
-
-        let extractedHash = null;
-
-        // 1. Cek jika respon berupa JSON
-        try {
-            const json = JSON.parse(rawText);
-            const kandidat = json.qr || json.token || json.qr_in || json.code || (json.data && (json.data.qr || json.data.token || json.data.code || json.data));
-            if (typeof kandidat === 'string' && kandidat.length >= 6) {
-                extractedHash = kandidat.trim();
-            }
-        } catch (e) {
-            // 2. Cek jika respon berupa teks mentah / HTML berpola YYYY-MM-DD + Hash
-            const matchFull = rawText.match(/\d{4}-\d{2}-\d{2}([a-zA-Z0-9]{8,20})/);
-            if (matchFull) {
-                extractedHash = matchFull[0];
-            } else {
-                // 3. Cek jika respon hanya berisi string kode alfanumerik polos
-                const trimmed = rawText.trim();
-                if (/^[a-zA-Z0-9\-]{8,30}$/.test(trimmed)) {
-                    extractedHash = trimmed;
-                }
-            }
-        }
-
-        if (extractedHash) {
-            document.getElementById('qrHash').value = extractedHash;
-            updatePreviewQr();
-            log(`✅ Token Hash QR berhasil diperbarui otomatis: ${val('qrHash')}`);
-            return true;
-        } else {
-            log(`⚠️ Pola token QR belum terdeteksi dari respon di atas.`);
-            return false;
-        }
-    } catch (err) {
-        log(`❌ Gagal mengambil QR dari ${url}: ${err.message}`);
-        return false;
-    }
 }
 
 async function callApi(method, path, body = null, withAuth = true) {
@@ -331,26 +309,18 @@ function verifikasiLokasi() {
     });
 }
 
-async function kirimQrIn() {
-    if (document.getElementById('autoFetchQr').checked) {
-        await ambilQrServer();
-    }
+function kirimQrIn() {
     updatePreviewQr();
-    const payloadQr = `${getTanggalHariIni()}${val('qrHash')}`;
     callApi('POST', '/user/qr_in', {
-        qr_in: payloadQr,
+        qr_in: `${getTanggalHariIni()}${val('qrHash')}`,
         id: parseInt(val('userId'))
     });
 }
 
-async function kirimQrOut() {
-    if (document.getElementById('autoFetchQr').checked) {
-        await ambilQrServer();
-    }
+function kirimQrOut() {
     updatePreviewQr();
-    const payloadQr = `${getTanggalHariIni()}${val('qrHash')}`;
     callApi('POST', '/user/qr_out', {
-        qr_out: payloadQr,
+        qr_out: `${getTanggalHariIni()}${val('qrHash')}`,
         id: parseInt(val('userId'))
     });
 }
