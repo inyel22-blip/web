@@ -141,6 +141,7 @@
         <button type="button" class="btn-amber" onclick="verifikasiLokasi()">1. Verifikasi Lokasi (/user/verifikasi_loc)</button>
         <button type="button" class="btn-green" onclick="kirimQrIn()">2. Kirim QR Check-In (/user/qr_in)</button>
         <button type="button" class="btn-purple" onclick="kirimQrOut()">3. Kirim QR Check-Out (/user/qr_out)</button>
+        <button type="button" class="btn-cyan" onclick="generateTokenQr()">🔄 Generate Token QR (/user/generate-token-qr)</button>
     </div>
 
     <!-- 2. CEK STATUS HARI INI, PROFIL & VERSI -->
@@ -373,7 +374,14 @@ function cekRekapV2() {
         id: parseInt(val('userId')),
         date: tanggalAwalBulan
     });
-}
+} // <-- Menambahkan kurung penutup yang hilang di sini
+
+function generateTokenQr() {
+    callApi('GET', '/user/generate-token-qr', {
+        id: parseInt(val('userId'))
+    });
+} // <-- Menghapus duplikasi dan memperbaiki struktur objek/fungsi
+
 
 </script>
 
