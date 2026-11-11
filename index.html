@@ -133,6 +133,8 @@
             <div class="form-group">
                 <label>Payload Siap Kirim: qr_out</label>
                 <input type="text" id="qrOutPreview" readonly>
+                <button class="btn-cyan" style="background-color: #0275d8;" onclick="cekStatusHariIni()">🔍 Cek Status Presensi Hari Ini</button>
+<button class="btn-gray" style="background-color: #292b2c;" onclick="cekRiwayatKehadiran()">📅 Cek Riwayat Kehadiran Pegawai</button>
             </div>
         </div>
 
@@ -374,13 +376,59 @@ function cekRekapV2() {
         id: parseInt(val('userId')),
         date: tanggalAwalBulan
     });
-} // <-- Menambahkan kurung penutup yang hilang di sini
+}
 
 function generateTokenQr() {
     callApi('GET', '/user/generate-token-qr', {
         id: parseInt(val('userId'))
     });
-} // <-- Menghapus duplikasi dan memperbaiki struktur objek/fungsi
+}
+
+// 1. Fungsi Cek Status Harian (Ditambahkan Header Perangkat)
+async function cekStatusHariIni() {
+    log("⏳ Memeriksa status presensi hari ini...");
+    try {
+        // Mengambil Device ID dari kolom input paling atas di dashboard Anda
+        const deviceId = document.getElementById('x-install-id') ? document.getElementById('x-install-id').value : val('installId');
+        const URL_LENGKAP = `https://baritotimurkab.go.id`;
+        
+        const respons = await fetch(URL_LENGKAP, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'x-install-id': deviceId // Menyertakan ID perangkat agar server mau merespons
+            }
+        });
+        const hasilJson = await respons.json();
+        alert(`Respons Server [${respons.status}]:\n${JSON.stringify(hasilJson, null, 2)}`);
+    } catch (error) {
+        alert(`❌ Gagal terhubung ke server!\nDetail: ${error.message}\n\nTips: Buka tab web presensi utama dulu agar sesinya aktif.`);
+    }
+}
+
+// 2. Fungsi Cek Riwayat Kehadiran (Ditambahkan Header Perangkat)
+async function cekRiwayatKehadiran() {
+    log("⏳ Menarik log riwayat kehadiran...");
+    try {
+        const deviceId = document.getElementById('x-install-id') ? document.getElementById('x-install-id').value : val('installId');
+        const URL_LENGKAP = `https://baritotimurkab.go.id`;
+        
+        const respons = await fetch(URL_LENGKAP, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'x-install-id': deviceId // Menyertakan ID perangkat agar server mau merespons
+            }
+        });
+        const hasilJson = await respons.json();
+        alert(`Respons Server [${respons.status}]:\n${JSON.stringify(hasilJson, null, 2)}`);
+    } catch (error) {
+        alert(`❌ Gagal terhubung ke server!\nDetail: ${error.message}`);
+    }
+    
+}
 
 
 </script>
