@@ -152,6 +152,7 @@
         <button type="button" onclick="cekToday()">Cek Absen Hari Ini (POST /user/get_today)</button>
         <button type="button" onclick="cekProfil()">Cek Profil Pegawai (GET /user/{id})</button>
         <button type="button" class="btn-gray" onclick="cekVersi()">Cek Versi API (GET /version)</button>
+        <button type="button" class="btn-cyan" onclick="cekSesiPerangkat()">🔑 Cek Sesi Perangkat (GET /user/check_session)</button>
     </div>
 
     <!-- 3. REKAPITULASI & NILAI TPP -->
@@ -427,7 +428,31 @@ async function cekRiwayatKehadiran() {
     } catch (error) {
         alert(`❌ Gagal terhubung ke server!\nDetail: ${error.message}`);
     }
-    
+   // Fungsi Tambahan untuk Cek Validitas Sesi Perangkat
+async function cekSesiPerangkat() {
+    log("⏳ Memeriksa sesi perangkat ke server...");
+    try {
+        const idPegawai = val('userId') ? val('userId') : "2682";
+        const URL_LENGKAP = 'https://api-absen.baritotimurkab.go.id/public/api/user/' + idPegawai;
+        
+        const respons = await fetch(URL_LENGKAP, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        });
+        const hasilJson = await respons.json();
+        alert(`Respons Sesi [${respons.status}]:\n${JSON.stringify(hasilJson, null, 2)}`);
+    } catch (error) {
+        alert(`❌ Gagal terhubung ke server!\nDetail: ${error.message}`);
+    }
+}
+</script>
+
+</body>
+</html>
+ 
 }
 
 
