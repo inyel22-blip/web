@@ -164,7 +164,7 @@
                 <input type="number" id="tahun">
             </div>
         </div>
-        <button type="button" onclick="cekRekap()">Cek Rekap Bulanan (POST /user/rekap/{id})</button>
+        <button type="button" class="btn-purple" onclick="cekRekapV2()">4. Cek Rekap Bulanan V2</button>
         <button type="button" class="btn-green" onclick="cekTpp()">Cek Nilai TPP (GET /user/get_tpp/{id}/{bulan}/{tahun})</button>
     </div>
 </div>
@@ -363,6 +363,18 @@ function ambilGpsAsli() {
         (err) => log(`❌ Gagal mengambil GPS: ${err.message}`)
     );
 }
+function cekRekapV2() {
+    const sekarang = new Date();
+    const yyyy = sekarang.getFullYear();
+    const mm = String(sekarang.getMonth() + 1).padStart(2, '0');
+    const tanggalAwalBulan = `${yyyy}-${mm}-01`;
+
+    callApi('POST', '/user/get_rekap_bulanan_v2', {
+        id: parseInt(val('userId')),
+        date: tanggalAwalBulan
+    });
+}
+
 </script>
 
 </body>
