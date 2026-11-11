@@ -391,7 +391,7 @@ async function cekStatusHariIni() {
     try {
         // Mengambil Device ID dari kolom input paling atas di dashboard Anda
         const deviceId = document.getElementById('x-install-id') ? document.getElementById('x-install-id').value : val('installId');
-        const URL_LENGKAP = `'https://api-absen.baritotimurkab.go.id/public/api/user`;
+        const URL_LENGKAP = `'https://presensi.baritotimurkab.go.id`;
         
         const respons = await fetch(URL_LENGKAP, {
             method: 'GET',
@@ -413,7 +413,7 @@ async function cekRiwayatKehadiran() {
     log("⏳ Menarik log riwayat kehadiran...");
     try {
         const deviceId = document.getElementById('x-install-id') ? document.getElementById('x-install-id').value : val('installId');
-        const URL_LENGKAP = `'https://api-absen.baritotimurkab.go.id/public/api/user`;
+        const URL_LENGKAP = `'https://presensi.baritotimurkab.go.id`;
         
         const respons = await fetch(URL_LENGKAP, {
             method: 'GET',
