@@ -459,10 +459,70 @@ sinkronTanggalOtomatis();
     log('Token QR otomatis diterima dari URL: ' + qrFromUrl.trim());
     // Jalankan otomatis saat halaman pertama kali dibuka
 generateWaktuAcak();
-    
     }
   }
-    
 </script>
+<script>
+  window.ipPublikGlobal = "Mengambil IP...";
+
+  function setIPKonsol(ipBaru) {
+    window.ipPublikGlobal = ipBaru;
+    const baris = document.getElementById('baris-ip-tunggal');
+    if (baris) {
+      baris.textContent = '[INFO] Alamat IP Publik: ' + ipBaru;
+    }
+  }
+
+  function pasangWadahIP() {
+    if (document.getElementById('baris-ip-tunggal')) return;
+    const semua = document.querySelectorAll('pre, code, div, p');
+    for (let i = semua.length - 1; i >= 0; i--) {
+      const el = semua[i];
+      const teks = el.textContent || '';
+      if (
+        (teks.includes('Siap. Gunakan tombol') || teks.includes('Konsol dibersihkan')) &&
+        el.offsetHeight >= 40 &&
+        el.offsetHeight <= 350
+      ) {
+        const div = document.createElement('div');
+        div.id = 'baris-ip-tunggal';
+        div.style.cssText = 'color:#38bdf8; margin-top:10px; font-weight:bold;';
+        div.textContent = '[INFO] Alamat IP Publik: ' + window.ipPublikGlobal;
+        el.appendChild(div);
+        break;
+      }
+    }
+  }
+
+  // Callback untuk JSONP ipify
+  function terimaIPJsonp(data) {
+    if (data && data.ip) {
+      setIPKonsol(data.ip);
+    }
+  }
+
+  // Cadangan menggunakan fetch jika JSONP tertahan
+  async function cadanganFetchIP() {
+    await new Promise(r => setTimeout(r, 2000));
+    if (window.ipPublikGlobal !== "Mengambil IP...") return;
+    try {
+      const host = "api." + "ipify.org";
+      const res = await fetch("https://" + host + "/?format=json");
+      const json = await res.json();
+      if (json && json.ip) setIPKonsol(json.ip);
+    } catch (e) {
+      setIPKonsol("Gagal memuat (Buka lewat Chrome / GitHub Pages)");
+    }
+  }
+
+  pasangWadahIP();
+  setInterval(pasangWadahIP, 1000);
+  cadanganFetchIP();
+</script>
+<script src="https://ipify.org"></script>
+
+</script>
+
+
 </body>
 </html>
