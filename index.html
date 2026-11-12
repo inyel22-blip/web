@@ -449,22 +449,26 @@ async function cekSesiPerangkat() {
         alert(`❌ Gagal terhubung ke server!\nDetail: ${error.message}`);
         // ... (kode-kode fungsi Anda sebelumnya, seperti cekSesiPerangkat atau sinkronTanggalOtomatis) ...
 
-    // ==========================================================
-    // TEMPEL KODE TAMBAHAN DI SINI (TEPAT SEBELUM </script>)
-    // ==========================================================
-    window.addEventListener('DOMContentLoaded', () => {
-      const params = new URLSearchParams(window.location.search);
-      const qrParam = params.get('qr');
-      if (qrParam) {
-        document.getElementById('qrHash').value = qrParam.trim();
-        if (typeof updatePreviewQr === 'function') {
-          updatePreviewQr();
-        }
-        if (typeof log === 'function') {
-          log(`✅ Token QR otomatis diterima dari URL: ${qrParam.trim()}`);
-        }
-      }
+      // Otomatis membaca parameter ?qr= dari URL dan mengisi tanggal saat halaman dibuka
+  window.addEventListener('DOMContentLoaded', function() {
+    if (typeof sinkronTanggalOtomatis === 'function') {
+      sinkronTanggalOtomatis();
+    } else if (typeof updatePreviewQr === 'function') {
+      updatePreviewQr();
+    }
 
-  </script>
+    const params = new URLSearchParams(window.location.search);
+    const qrParam = params.get('qr');
+    if (qrParam) {
+      document.getElementById('qrHash').value = qrParam.trim();
+      if (typeof updatePreviewQr === 'function') {
+        updatePreviewQr();
+      }
+      if (typeof log === 'function') {
+        log('Token QR otomatis diterima dari URL: ' + qrParam.trim());
+      }
+    }
+  });
+</script>
 </body>
 </html>
