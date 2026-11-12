@@ -449,6 +449,15 @@ async function cekSesiPerangkat() {
         alert(`❌ Gagal terhubung ke server!\nDetail: ${error.message}`);
         // ... (kode-kode fungsi Anda sebelumnya, seperti cekSesiPerangkat atau sinkronTanggalOtomatis) ...
   
+        }
+sinkronTanggalOtomatis();
+  var urlParams = new URLSearchParams(window.location.search);
+  var qrFromUrl = urlParams.get('qr');
+  if (qrFromUrl) {
+    setVal('qrHash', qrFromUrl.trim());
+    updatePreviewQr();
+    log('Token QR otomatis diterima dari URL: ' + qrFromUrl.trim());
+    
     }
   }
 </script>
