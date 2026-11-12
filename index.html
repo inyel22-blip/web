@@ -142,19 +142,19 @@
 
         <button type="button" class="btn-cyan" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="tempelQrClipboard()">📥 Tempel Token QR dari Clipboard</button>
         <button type="button" class="btn-red" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="ambilGpsAsli()">📍 Ambil GPS Browser</button>
-        <button type="button" class="btn-amber" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="verifikasiLokasi()">1. Verifikasi Lokasi (/user/verifikasi_loc)</button>
-        <button type="button" class="btn-green" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="kirimQrIn()">2. Kirim QR Check-In (/user/qr_in)</button>
-        <button type="button" class="btn-purple" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="kirimQrOut()">3. Kirim QR Check-Out (/user/qr_out)</button>
-        <button type="button" class="btn-cyan" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="generateTokenQr()">🔄 Generate Token QR (/user/generate-token-qr)</button>
+        <button type="button" class="btn-amber" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="verifikasiLokasi()">1. Verifikasi Lokasi</button>
+        <button type="button" class="btn-green" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="kirimQrIn()">2. Kirim Check-In</button>
+        <button type="button" class="btn-purple" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="kirimQrOut()">3. Kirim Check-Out</button>
+        <button type="button" class="btn-cyan" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="generateTokenQr()">🔄 Generate Token QR</button>
         </div>
 
     <!-- 2. CEK STATUS HARI INI, PROFIL & VERSI -->
     <div class="card">
         <h2>👤 2. Data Pegawai & Status Kehadiran Hari Ini</h2>
-        <button type="button" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="cekToday()">Cek Absen Hari Ini (POST /user/get_today)</button>
-        <button type="button" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="cekProfil()">Cek Profil Pegawai (GET /user/{id})</button>
-        <button type="button" class="btn-gray" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="cekVersi()">Cek Versi API (GET /version)</button>
-        <button type="button" class="btn-cyan" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="cekSesiPerangkat()">🔑 Cek Sesi Perangkat (GET /user/check_session)</button>
+        <button type="button" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="cekToday()">Cek Absen Hari Ini</button>
+        <button type="button" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="cekProfil()">Cek Profil Pegawai</button>
+        <button type="button" class="btn-gray" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="cekVersi()">Cek Versi API</button>
+        <button type="button" class="btn-cyan" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="cekSesiPerangkat()">🔑 Cek Sesi Perangkat</button>
         </div>
 
     <!-- 3. REKAPITULASI & NILAI TPP -->
@@ -170,8 +170,8 @@
                 <input type="number" id="tahun">
             </div>
         </div>
-        <button type="button" class="btn-purple" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="cekRekapV2()">4. Cek Rekap Bulanan V2</button>
-        <button type="button" class="btn-green" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="cekTpp()">Cek Nilai TPP (GET /user/get_tpp/{id}/{bulan}/{tahun})</button
+        <button type="button" class="btn-purple" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="cekRekapV2()">Cek Rekap Bulanan V2</button>
+        <button type="button" class="btn-green" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="cekTpp()">Cek Nilai TPP</button
      </div>
 </div>
 
