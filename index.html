@@ -447,9 +447,24 @@ async function cekSesiPerangkat() {
         alert(`Respons Sesi [${respons.status}]:\n${JSON.stringify(hasilJson, null, 2)}`);
     } catch (error) {
         alert(`❌ Gagal terhubung ke server!\nDetail: ${error.message}`);
-    }
-}
-</script>
+        // ... (kode-kode fungsi Anda sebelumnya, seperti cekSesiPerangkat atau sinkronTanggalOtomatis) ...
 
+    // ==========================================================
+    // TEMPEL KODE TAMBAHAN DI SINI (TEPAT SEBELUM </script>)
+    // ==========================================================
+    window.addEventListener('DOMContentLoaded', () => {
+      const params = new URLSearchParams(window.location.search);
+      const qrParam = params.get('qr');
+      if (qrParam) {
+        document.getElementById('qrHash').value = qrParam.trim();
+        if (typeof updatePreviewQr === 'function') {
+          updatePreviewQr();
+        }
+        if (typeof log === 'function') {
+          log(`✅ Token QR otomatis diterima dari URL: ${qrParam.trim()}`);
+        }
+      }
+
+  </script>
 </body>
 </html>
