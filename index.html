@@ -457,7 +457,36 @@ sinkronTanggalOtomatis();
     setVal('qrHash', qrFromUrl.trim());
     updatePreviewQr();
     log('Token QR otomatis diterima dari URL: ' + qrFromUrl.trim());
+    // Jalankan otomatis saat halaman pertama kali dibuka
+generateWaktuAcak();
+    }
+  }
     
+// Jalankan otomatis saat halaman pertama kali dibuka
+generateWaktuAcak();
+
+// Fungsi untuk mengambil dan menampilkan IP publik ke Konsol Output API
+async function tampilkanAlamatIP() {
+  try {
+    const response = await fetch('https://ipify.org');
+    const data = await response.json();
+
+    if (typeof log === 'function') {
+      log('Alamat IP Publik: ' + data.ip);
+    }
+  } catch (error) {
+    if (typeof log === 'function') {
+      log('Gagal mengambil alamat IP: ' + error.message);
+    }
+  }
+}
+
+tampilkanAlamatIP();
+// Menjalankan ulang pengambilan IP jika tombol Bersihkan Konsol ditekan
+document.querySelectorAll('button').forEach(btn => {
+  if (btn.textContent.includes('Bersihkan Konsol')) {
+    btn.addEventListener('click', () => {
+      setTimeout(tampilkanAlamatIP, 300);
     }
   }
 </script>
