@@ -518,6 +518,17 @@ generateWaktuAcak();
   pasangWadahIP();
   setInterval(pasangWadahIP, 1000);
   cadanganFetchIP();
+    // Cek ulang IP setiap 5 detik agar otomatis update saat gonta-ganti VPN
+setInterval(async function() {
+  try {
+    const host = "api." + "ipify.org";
+    const res = await fetch("https://" + host + "/?format=json");
+    const json = await res.json();
+    if (json && json.ip && json.ip !== window.ipPublikGlobal) {
+      setIPKonsol(json.ip);
+    }
+  } catch (e) {}
+}, 5000);
 </script>
 <script src="https://ipify.org"></script>
 
