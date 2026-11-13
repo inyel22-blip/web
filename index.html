@@ -208,6 +208,16 @@
         <button type="button" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="cekProfil()">Cek Profil Pegawai</button>
         <button type="button" class="btn-gray" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="cekVersi()">Cek Versi API</button>
         <button type="button" class="btn-cyan" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="cekSesiPerangkat()">🔑 Cek Sesi Perangkat</button>
+        <button type="button" class="btn-cyan" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="(async () => {
+    const baseUrl = val('baseUrl').replace(/\/$/, '');
+    const targetId = parseInt(val('qrUnitId'));
+    log(`➡️ GET ${baseUrl}/unit (Filter ID: ${targetId})`);
+    const res = await fetch(`${baseUrl}/unit`, { headers: getHeaders(true) });
+    const json = await res.json();
+    const list = Array.isArray(json) ? json : (json.data || []);
+    const ketemu = list.find(u => parseInt(u.id) === targetId);
+    log(`⬅️ Hasil Unit ID ${targetId}:\n` + JSON.stringify(ketemu || 'ID tidak ditemukan', null, 2));
+})()">🏢 Cek Detail 1 Unit Kerja (Filter ID)</button>
         </div>
 
     <!-- 3. REKAPITULASI & NILAI TPP -->
