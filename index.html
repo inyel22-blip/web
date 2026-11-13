@@ -56,24 +56,26 @@
     <!-- KONFIGURASI HEADER & AUTENTIKASI -->
     <div class="card config-card">
         <h2>🔑 Konfigurasi Token, Device ID & Web QR</h2>
-        <div class="row">
-            <div class="form-group">
-                <label>Base URL API</label>
-                <input type="text" id="baseUrl" value="https://api-absen.baritotimurkab.go.id/public/api">
-            </div>
-            <div class="form-group">
-                <label>User ID Pegawai</label>
-                <input type="number" id="userId" value="2682">
-            </div>
-            <div class="form-group">
-                <label>ID Unit QR</label>
-                <input type="number" id="qrUnitId" value="31" oninput="updateQrUrl()">
+        <!-- Base URL tetap disimpan secara tersembunyi -->
+<div class="form-group" style="display: none;">
+    <label>Base URL API</label>
+    <input type="text" id="baseUrl" value="https://baritotimurkab.go.id">
+</div>
+
+<!-- Wadah sejajar kiri-kanan dan berada pas di tengah -->
+<div style="display: flex; justify-content: center; gap: 20px; margin-top: 10px;">
+    <div style="text-align: center;">
+        <label for="userId" style="display: block; margin-bottom: 5px;">User ID Pegawai</label>
+        <input type="number" id="userId" value="2682" style="width: 120px; text-align: center;">
+    </div>
+    <div style="text-align: center;">
+        <label for="qrUnitId" style="display: block; margin-bottom: 5px;">ID Unit</label>
+        <input type="number" id="qrUnitId" value="31" style="width: 120px; text-align: center;" oninput="updatePreviewQr()">
+    </div>
             </div>
         </div>
-        <div class="form-group">
-            <label>URL Web QR Server (Wajib Login Web Dahulu)</label>
-            <input type="text" id="qrFullUrl" value="https://presensi.baritotimurkab.go.id/get_qr/31">
         </div>
+        <div style="display: none;">
         <div class="form-group">
             <label>Authorization Bearer Token (API Mobile)</label>
             <input type="text" id="bearerToken" value="YDZ0p6qlok7mURXSu7NOBlg5461R8EWL60wIsf4Z50742568">
