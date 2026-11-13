@@ -147,7 +147,16 @@
         <button type="button" class="btn-amber" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="verifikasiLokasi()">1. Verifikasi Lokasi</button>
         <button type="button" class="btn-green" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="kirimQrIn()">2. Kirim Check-In</button>
         <button type="button" class="btn-purple" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="kirimQrOut()">3. Kirim Check-Out</button>
-        <button type="button" class="btn-cyan" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="generateTokenQr()">🔄 Generate Token QR</button>
+         <button type="button" class="btn-cyan" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="(async () => {
+    const baseUrl = val('baseUrl').replace(/\/$/, '');
+    const targetId = parseInt(val('qrUnitId'));
+    log(`➡️ GET ${baseUrl}/unit (Filter ID: ${targetId})`);
+    const res = await fetch(`${baseUrl}/unit`, { headers: getHeaders(true) });
+    const json = await res.json();
+    const list = Array.isArray(json) ? json : (json.data || []);
+    const ketemu = list.find(u => parseInt(u.id) === targetId);
+    log(`⬅️ Hasil Unit ID ${targetId}:\n` + JSON.stringify(ketemu || 'ID tidak ditemukan', null, 2));
+})()">🏢 Cek Detail 1 Unit Kerja</button>
         <button type="button" class="btn-amber" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="(async () => {
     const baseUrl = document.getElementById('baseUrl').value.trim();
     const token = document.getElementById('bearerToken').value.trim();
@@ -209,17 +218,7 @@
         <button type="button" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="cekToday()">Cek Absen Hari Ini</button>
         <button type="button" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="cekProfil()">Cek Profil Pegawai</button>
         <button type="button" class="btn-gray" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="cekVersi()">Cek Versi API</button>
-        <button type="button" class="btn-cyan" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="cekSesiPerangkat()">🔑 Cek Sesi Perangkat</button>
-        <button type="button" class="btn-cyan" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="(async () => {
-    const baseUrl = val('baseUrl').replace(/\/$/, '');
-    const targetId = parseInt(val('qrUnitId'));
-    log(`➡️ GET ${baseUrl}/unit (Filter ID: ${targetId})`);
-    const res = await fetch(`${baseUrl}/unit`, { headers: getHeaders(true) });
-    const json = await res.json();
-    const list = Array.isArray(json) ? json : (json.data || []);
-    const ketemu = list.find(u => parseInt(u.id) === targetId);
-    log(`⬅️ Hasil Unit ID ${targetId}:\n` + JSON.stringify(ketemu || 'ID tidak ditemukan', null, 2));
-})()">🏢 Cek Detail 1 Unit Kerja (Filter ID)</button>
+        <button type="button" class="btn-cyan" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="cekSesiPerangkat()">🔑 Cek Sesi Perangkat</button> 
         </div>
 
     <!-- 3. REKAPITULASI & NILAI TPP -->
