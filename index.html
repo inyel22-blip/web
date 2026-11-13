@@ -146,6 +146,59 @@
         <button type="button" class="btn-green" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="kirimQrIn()">2. Kirim Check-In</button>
         <button type="button" class="btn-purple" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="kirimQrOut()">3. Kirim Check-Out</button>
         <button type="button" class="btn-cyan" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="generateTokenQr()">🔄 Generate Token QR</button>
+        <button type="button" class="btn-amber" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="(async () => {
+    const baseUrl = document.getElementById('baseUrl').value.trim();
+    const token = document.getElementById('bearerToken').value.trim();
+    const deviceId = document.getElementById('deviceId').value.trim();
+    const konsol = document.querySelector('.console');
+    const log = (t) => { if(konsol){ konsol.textContent += t + '\n'; konsol.scrollTop = konsol.scrollHeight; } };
+
+    const daftar = [
+        { u: '/user/pegawai_unit', m: 'POST' },
+        { u: '/user/unit', m: 'GET' },
+        { u: '/user/lokasi', m: 'GET' },
+        { u: '/user/get_lokasi', m: 'GET' },
+        { u: '/user/dalam_daerah', m: 'POST' },
+        { u: '/user/luar_daerah', m: 'POST' },
+        { u: '/user/tugas_dinas', m: 'POST' },
+        { u: '/user/izin_sehari', m: 'POST' },
+        { u: '/user/izin_more_day', m: 'POST' },
+        { u: '/user/izin', m: 'GET' },
+        { u: '/user/cuti', m: 'GET' },
+        { u: '/user/riwayat', m: 'GET' },
+        { u: '/user/history', m: 'GET' },
+        { u: '/user/rekap', m: 'POST' },
+        { u: '/user/absen_masuk', m: 'POST' },
+        { u: '/user/absen_pulang', m: 'POST' },
+        { u: '/unit', m: 'GET' }
+    ];
+
+    log('\n🔍 Memulai pemindaian ' + daftar.length + ' rute API...');
+    for (const item of daftar) {
+        try {
+            const opsi = {
+                method: item.m,
+                headers: {
+                    'Authorization': 'Bearer ' + token,
+                    'x-device-id': deviceId,
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                }
+            };
+            if (item.m === 'POST') opsi.body = '{}';
+            const r = await fetch(baseUrl + item.u, opsi);
+            let statusKet = 'Tidak ada (404)';
+            if (r.status === 200) statusKet = '✅ AKTIF (200 OK)';
+            else if (r.status === 422) statusKet = '✅ AKTIF (Butuh data form)';
+            else if (r.status === 405) statusKet = '⚠️ ADA (Ganti metode GET/POST)';
+            else if (r.status === 401) statusKet = '🔒 Token kedaluwarsa';
+            log('[' + r.status + '] ' + item.m + ' ' + item.u + ' -> ' + statusKet);
+        } catch (e) {
+            log('[ERR] ' + item.u);
+        }
+    }
+    log('🏁 Pemindaian selesai.');
+})()">🔍 Scan Semua Rute API (/user/...)</button>
         </div>
 
     <!-- 2. CEK STATUS HARI INI, PROFIL & VERSI -->
@@ -295,17 +348,23 @@ Payload: ${JSON.stringify(body)}` : ''));
         const res = await fetch(url, options);
         const text = await res.text();
         
-        let formatted = text;
+                let formatted = text;
         try {
-            formatted = JSON.stringify(JSON.parse(text), null, 2);
+            const parsed = JSON.parse(text);
+            formatted = JSON.stringify(parsed, null, 2);
+            if (parsed && parsed.data && parsed.data.lat && parsed.data.long) {
+                document.getElementById('lat').value = parsed.data.lat;
+                document.getElementById('lng').value = parsed.data.long;
+                log(`🏢 Koordinat kantor otomatis diterapkan: ${parsed.data.lat}, ${parsed.data.long}`);
+            }
         } catch (e) {}
 
-        log(`⬅️ HTTP ${res.status} ${res.statusText}
-${formatted}`);
+                log(`⬅️ HTTP ${res.status} ${res.statusText}\n${formatted}`);
     } catch (err) {
         log(`❌ Error Jaringan / CORS Browser: ${err.message}`);
     }
 }
+
 
 function verifikasiLokasi() {
     callApi('POST', '/user/verifikasi_loc', {
