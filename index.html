@@ -219,6 +219,7 @@
         <button type="button" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="cekProfil()">Cek Profil Pegawai</button>
         <button type="button" class="btn-gray" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="cekVersi()">Cek Versi API</button>
         <button type="button" class="btn-cyan" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="cekSesiPerangkat()">🔑 Cek Sesi Perangkat</button> 
+        <button type="button" class="btn-amber" style="width: 100%; padding: 16px 24px; font-size: 16px; margin-top: 8px;" onclick="prosesRefreshToken()">🔄 Refresh Token</button>
         </div>
 
     <!-- 3. REKAPITULASI & NILAI TPP -->
@@ -451,10 +452,10 @@ function cekRekapV2() {
     });
 }
 
-function generateTokenQr() {
-    callApi('GET', '/user/generate-token-qr', {
-        id: parseInt(val('userId'))
-    });
+function prosesRefreshToken() {
+  callApi('GET', '/user/refresh-token', {
+    id: parseInt(val('userId'))
+  });
 }
 
 // 1. Fungsi Cek Status Harian (Ditambahkan Header Perangkat)
