@@ -328,7 +328,8 @@ async function sinkronTanggalOtomatis() {
         log(`🔑 [OTOMATIS] QR Check-Out (12-17 WIB) Unit ${targetUnitId}: ${unit.qr_out}`);
       } else {
         document.getElementById('qrHash').value = '';
-        log(`⏰ [INFO] Di luar jam presensi (${jamWib}:00 WIB), Token QR dikosongkan.`);
+        const jamMenitWib = new Intl.DateTimeFormat('id-ID', { timeZone: 'Asia/Jakarta', hour: '2-digit', minute: '2-digit' }).format(new Date());
+        log(`⏰ [INFO] Di luar jam presensi 07.00-17.00 (Sekarang ${jamMenitWib} WIB), Token QR dikosongkan.`);
       }
       updatePreviewQr();
     }
