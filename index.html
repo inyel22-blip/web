@@ -291,8 +291,8 @@ function updatePreviewQr() {
     }
     document.getElementById('displayTanggal').textContent = tglStr;
     document.getElementById('autoTanggal').value = tglStr;
-    document.getElementById('qrInPreview').value = `${tglStr}-${hash}`;
-   document.getElementById('qrOutPreview').value = `${tglStr}-${hash}`;
+    document.getElementById('qrInPreview').value = `${tglStr}${hash}`;
+   document.getElementById('qrOutPreview').value = `${tglStr}${hash}`;
 }
 
 async function sinkronTanggalOtomatis() {
