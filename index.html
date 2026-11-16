@@ -142,7 +142,7 @@
             </div>
         </div>
 
-        <button type="button" class="btn-red" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="verifikasiLokasi()">1. Verifikasi Lokasi</button>
+        <button type="button" class="btn-amber" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="verifikasiLokasi()">1. Verifikasi Lokasi</button>
         <button type="button" class="btn-green" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="kirimQrIn()">2. Kirim Check-In</button>
         <button type="button" class="btn-purple" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="kirimQrOut()">3. Kirim Check-Out</button>
          <button type="button" class="btn-cyan" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="(async () => {
@@ -192,11 +192,14 @@
   { u: '/setting', m: 'GET' }, { u: '/settings', m: 'GET' }, { u: '/config', m: 'GET' },
   { u: '/app_version', m: 'GET' }, { u: '/cek_versi', m: 'GET' }, { u: '/version_v2', m: 'GET' },
 
-  // Kategori Presensi Alternatif
+    // Kategori Presensi Alternatif & Cek Perangkat
   { u: '/user/qr_in_v2', m: 'POST' }, { u: '/user/qr_out_v2', m: 'POST' },
-  { u: '/user/absen_wfh', m: 'POST' }, { u: '/user/wfh', m: 'POST' },
+  { u: '/user/absen_selfie', m: 'POST' }, { u: '/user/selfie', m: 'POST' },
   { u: '/user/apel', m: 'POST' }, { u: '/user/qr_apel', m: 'POST' },
-  { u: '/user/lembur', m: 'POST' }, { u: '/user/qr_lembur', m: 'POST' }
+  { u: '/user/lembur', m: 'POST' }, { u: '/user/qr_lembur', m: 'POST' },
+  { u: '/user/device', m: 'GET' }, { u: '/user/device_info', m: 'GET' },
+  { u: '/user/reset_device', m: 'POST' }, { u: '/reset_device', m: 'POST' },
+  { u: '/user/unbind_device', m: 'POST' }, { u: '/user/cek_device', m: 'GET' }
 ];
 
 log(`🔎 Memulai pemindaian ${kandidatRute.length} kandidat rute API (hanya menampilkan yang aktif)...`);
@@ -296,10 +299,10 @@ function updatePreviewQr() {
 async function sinkronTanggalOtomatis() {
   const now = new Date();
   updatePreviewQr();
-  if (document.getElementById('bulan').value) {
+    if (document.getElementById('bulan')) {
     document.getElementById('bulan').value = now.getMonth() + 1;
   }
-  if (document.getElementById('tahun').value) {
+  if (document.getElementById('tahun')) {
     document.getElementById('tahun').value = now.getFullYear();
   }
 
@@ -318,12 +321,12 @@ async function sinkronTanggalOtomatis() {
         hour12: false
       }).format(new Date()), 10);
 
-      if (jamWib >= 7 && jamWib < 9 && unit.qr_in) {
+      if (jamWib >= 7 && jamWib < 12 && unit.qr_in) {
         document.getElementById('qrHash').value = unit.qr_in;
-        log(`🔑 [OTOMATIS] QR Check-In (07-09 WIB) Unit ${targetUnitId}: ${unit.qr_in}`);
-      } else if (jamWib >= 16 && jamWib < 17 && unit.qr_out) {
+        log(`🔑 [OTOMATIS] QR Check-In (07-12 WIB) Unit ${targetUnitId}: ${unit.qr_in}`);
+      } else if (jamWib >= 12 && jamWib < 17 && unit.qr_out) {
         document.getElementById('qrHash').value = unit.qr_out;
-        log(`🔑 [OTOMATIS] QR Check-Out (16-17 WIB) Unit ${targetUnitId}: ${unit.qr_out}`);
+        log(`🔑 [OTOMATIS] QR Check-Out (12-17 WIB) Unit ${targetUnitId}: ${unit.qr_out}`);
       } else {
         document.getElementById('qrHash').value = '';
         const jamMenitWib = new Intl.DateTimeFormat('id-ID', { timeZone: 'Asia/Jakarta', hour: '2-digit', minute: '2-digit' }).format(new Date());
@@ -478,7 +481,12 @@ function cekRekap() {
 }
 
 function cekTpp() {
-    callApi('GET', `/user/get_tpp/${val('userId')}/${val('bulan')}/${val('tahun')}`);
+  const sekarang = new Date();
+  const bln = val('bulan') || (sekarang.getMonth() + 1);
+  const thn = val('tahun') || sekarang.getFullYear();
+  if (document.getElementById('bulan')) document.getElementById('bulan').value = bln;
+  if (document.getElementById('tahun')) document.getElementById('tahun').value = thn;
+  callApi('GET', `/user/get_tpp/${val('userId')}/${bln}/${thn}`);
 }
 
 function ambilGpsAsli() {
