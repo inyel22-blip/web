@@ -101,10 +101,13 @@
 
     <!-- KONSOL LOG RESPON -->
     <div class="console-wrapper">
-        <div class="console-header">
-            <strong>[Konsol Output API]</strong>
-            <button type="button" class="btn-red" onclick="clearConsole()">Bersihkan Konsol</button>
-        </div>
+       <div class="console-header">
+  <div>
+    <strong>[Konsol Output API]</strong>
+    <span id="jamKonsol" style="margin-left: 8px; background: #020617; color: #4ade80; padding: 2px 8px; border-radius: 4px; font-family: 'Consolas', monospace; font-size: 12px;">00:00:00 WIB</span>
+  </div>
+  <button type="button" class="btn-red" onclick="clearConsole()">Bersihkan Konsol</button>
+</div>
         <div class="console" id="consoleBox">(inyel22@gmail.com)</div>
     </div>
 
@@ -684,6 +687,21 @@ setInterval(async function() {
     }
   } catch (e) {}
 }, 5000);
+function mulaiJamKonsol() {
+  const el = document.getElementById('jamKonsol');
+  if (!el) return;
+  setInterval(() => {
+    const waktu = new Date().toLocaleTimeString('id-ID', {
+      timeZone: 'Asia/Jakarta',
+      hour12: false,
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit'
+    }).replace(/\./g, ':');
+    el.textContent = `🕒 ${waktu}`;
+  }, 1000);
+}
+mulaiJamKonsol();
 </script>
 <script src="https://ipify.org"></script>
 
