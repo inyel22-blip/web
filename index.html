@@ -515,10 +515,29 @@ function cekRekapV2() {
     });
 }
 
-function prosesRefreshToken() {
-  callApi('POST', '/refresh', {
-    id: parseInt(val('userId'))
-  });
+async function prosesRefreshToken() {
+  const url = `${val('baseUrl').replace(/\/$/, '')}/refresh`;
+  const payload = { id: parseInt(val('userId')) };
+  log(`➡️ POST ${url}\nPayload: ${JSON.stringify(payload)}`);
+
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: getHeaders(true),
+      body: JSON.stringify(payload)
+    });
+    const text = await res.text();
+    const parsed = JSON.parse(text);
+
+    if (res.ok && parsed.token) {
+      document.getElementById('bearerToken').value = parsed.token;
+      log(`✅ HTTP ${res.status} OK - Token baru otomatis diperbarui:\n${parsed.token}`);
+    } else {
+      log(`⬅️ HTTP ${res.status}\n${text}`);
+    }
+  } catch (err) {
+    log(`❌ Gagal refresh token: ${err.message}`);
+  }
 }
 
 // 1. Fungsi Cek Status Harian (Ditambahkan Header Perangkat)
