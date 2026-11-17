@@ -245,7 +245,7 @@ log(`🏁 Pemindaian selesai! Ditemukan ${ditemukan} endpoint aktif baru.`);
         <button type="button" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="cekToday()">Cek Absen Hari Ini</button>
         <button type="button" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="cekProfil()">Cek Profil Pegawai</button>
         <button type="button" class="btn-gray" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="cekVersi()">Cek Versi API</button>
-        <button type="button" class="btn-cyan" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="cekSesiPerangkat()">🔑 Cek Sesi Perangkat</button> 
+        <button type="button" class="btn-green" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="prosesRefreshToken()">⚡ Refresh Sesi / Token</button>
         </div>
 
     <!-- 3. REKAPITULASI & NILAI TPP -->
@@ -516,7 +516,7 @@ function cekRekapV2() {
 }
 
 function prosesRefreshToken() {
-  callApi('GET', '/user/refresh-token', {
+  callApi('POST', '/refresh', {
     id: parseInt(val('userId'))
   });
 }
