@@ -306,49 +306,60 @@ function updatePreviewQr() {
 }
 
 async function sinkronTanggalOtomatis() {
-  const now = new Date();
-  updatePreviewQr();
+    const now = new Date();
+    updatePreviewQr();
     if (document.getElementById('bulan')) {
-    document.getElementById('bulan').value = now.getMonth() + 1;
-  }
-  if (document.getElementById('tahun')) {
-    document.getElementById('tahun').value = now.getFullYear();
-  }
+        document.getElementById('bulan').value = now.getMonth() + 1;
+    }
+    if (document.getElementById('tahun')) {
+        document.getElementById('tahun').value = now.getFullYear();
+    }
 
-  const targetUnitId = parseInt(val('qrUnitId')) || 31;
-  try {
-    const baseUrl = val('baseUrl').replace(/\/$/, '');
-    const res = await fetch(`${baseUrl}/unit`, { headers: getHeaders(true) });
-    const json = await res.json();
-    const arr = Array.isArray(json) ? json : (json.data || []);
-    const unit = arr.find(u => parseInt(u.id) === targetUnitId);
-
-    if (unit) {
-      const jamWib = parseInt(new Intl.DateTimeFormat('en-GB', {
+    // 1. Cek Jam WIB TERLEBIH DAHULU sebelum menghubungi server
+    const jamWib = parseInt(new Intl.DateTimeFormat('en-GB', {
         timeZone: 'Asia/Jakarta',
         hour: '2-digit',
         hour12: false
-      }).format(new Date()), 10);
+    }).format(now), 10);
 
-      if (jamWib >= 07 && jamWib < 08 && unit.qr_in) {
-        document.getElementById('qrHash').value = unit.qr_in;
-        log(`🔑 [OTOMATIS] QR Check-In (07-08 WIB) Unit ${targetUnitId}: ${unit.qr_in}`);
-      } else if (jamWib >= 16 && jamWib < 17 && unit.qr_out) {
-        document.getElementById('qrHash').value = unit.qr_out;
-        log(`🔑 [OTOMATIS] QR Check-Out (16-17 WIB) Unit ${targetUnitId}: ${unit.qr_out}`);
-      } else {
+    const isJamMasuk = (jamWib >= 7 && jamWib < 8);
+    const isJamPulang = (jamWib >= 16 && jamWib < 17);
+
+    // Jika di luar jam 07-08 dan 16-17, BERHENTI di sini (tidak ada request ke server)
+    if (!isJamMasuk && !isJamPulang) {
         document.getElementById('qrHash').value = '';
-        const jamMenitWib = new Intl.DateTimeFormat('id-ID', { timeZone: 'Asia/Jakarta', hour: '2-digit', minute: '2-digit' }).format(new Date());
-        log(`⏰ [INFO] Di luar jam presensi 07-08/16-17 (Sekarang ${jamMenitWib} WIB),Token QR dikosongkan🙏.`);
-      }
-      updatePreviewQr();
+        updatePreviewQr();
+        return; 
     }
-  } catch (e) {
-    log(`⚠️ Gagal sinkron QR otomatis: ${e.message}`);
-  }
+
+    // 2. Baru hubungi server jika memang sedang jam presensi
+    const targetUnitId = parseInt(val('qrUnitId')) || 31;
+    try {
+        const baseUrl = val('baseUrl').replace(/\/$/, '');
+        // Ubah menjadi seperti ini:
+const res = await fetch(`${baseUrl}/unit`, { headers: getHeaders(true) });
+        const json = await res.json();
+        const arr = Array.isArray(json) ? json : (json.data || []);
+        const unit = arr.find(u => parseInt(u.id) === targetUnitId);
+
+        if (unit) {
+            if (isJamMasuk && unit.qr_in) {
+                document.getElementById('qrHash').value = unit.qr_in;
+                log(`🔄 [OTOMATIS] QR Check-In (07-08 WIB): ${unit.qr_in}`);
+            } else if (isJamPulang && unit.qr_out) {
+                document.getElementById('qrHash').value = unit.qr_out;
+                log(`🔄 [OTOMATIS] QR Check-Out (16-17 WIB): ${unit.qr_out}`);
+            }
+            updatePreviewQr();
+        }
+    } catch (e) {
+        log(`⚠️ Gagal sinkron QR otomatis: ${e.message}`);
+    }
 }
 
+log('✅ [INFO] Di luar jam presensi 07-08 & 16-17 WIB)Token QR di tutup🙏');
 sinkronTanggalOtomatis();
+setInterval(sinkronTanggalOtomatis, 20000);
 
 function pakaiDeviceAndroid() {
     document.getElementById('deviceId').value = '40622cf44ad36bb1';
@@ -361,8 +372,7 @@ function pakaiDeviceWeb() {
 }
 
 function salinScriptConsole() {
-    const unitId = val('qrUnitId') || '31';
-    const script = `fetch('/get_qr/${unitId}').then(r=>r.text()).then(t=>{const m=t.match(/\d{4}-\d{2}-\d{2}[a-zA-Z0-9]{8,20}/);const h=m?m[0]:t.trim();navigator.clipboard?.writeText(h);alert('Token QR Tersalin:\n'+h);});`;
+    const script = `fetch('/get_qr/${unitId}').then(r=>r.text()).then(t=>{const m=t.match(/\\d{4}-\\d{2}-\\d{2}[A-Za-z0-9]{8,20}/);const h=m?m[0]:t.trim();navigator.clipboard?.writeText(h);alert('Token QR Tersalin:\\n'+h);});`;
     navigator.clipboard?.writeText(script);
     log(`📋 Script Console tersalin ke clipboard!
 1. Buka tab presensi.baritotimurkab.go.id (setelah login)
