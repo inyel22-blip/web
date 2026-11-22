@@ -308,60 +308,82 @@ function updatePreviewQr() {
 }
 
 async function sinkronTanggalOtomatis() {
-    const now = new Date();
-    updatePreviewQr();
-    if (document.getElementById('bulan')) {
-        document.getElementById('bulan').value = now.getMonth() + 1;
-    }
-    if (document.getElementById('tahun')) {
-        document.getElementById('tahun').value = now.getFullYear();
+  const now = new Date();
+  updatePreviewQr();
+  if (!document.getElementById('bulan').value) {
+    document.getElementById('bulan').value = now.getMonth() + 1;
+  }
+  if (!document.getElementById('tahun').value) {
+    document.getElementById('tahun').value = now.getFullYear();
+  }
+
+  const targetUnitId = parseInt(val('qrUnitId')) || 31;
+  try {
+    // 1. Ambil waktu resmi dari server
+    let waktuAcuan = new Date();
+    try {
+      const resTime = await fetch('https://presensi.baritotimurkab.go.id/api/check-server-time');
+            if (resTime.ok) {
+        const dataTime = await resTime.json();
+        if (dataTime.server_timestamp) {
+          waktuAcuan = new Date(dataTime.server_timestamp * 1000);
+        }
+      }
+    } catch (errTime) {
+      // Jika gagal memuat waktu server, otomatis gunakan waktu perangkat sebagai cadangan
     }
 
-    // 1. Cek Jam WIB TERLEBIH DAHULU sebelum menghubungi server
-    const jamWib = parseInt(new Intl.DateTimeFormat('en-GB', {
+    // 2. Ambil data unit & token QR
+    const baseUrl = val('baseUrl').replace(/\/$/, '');
+    const res = await fetch(`${baseUrl}/unit`, { headers: getHeaders(true) });
+    const json = await res.json();
+    const arr = Array.isArray(json) ? json : (json.data || []);
+    const unit = arr.find(u => parseInt(u.id) === targetUnitId);
+
+    if (unit) {
+      const jamWib = parseInt(new Intl.DateTimeFormat('en-GB', {
         timeZone: 'Asia/Jakarta',
         hour: '2-digit',
         hour12: false
-    }).format(now), 10);
+      }).format(waktuAcuan), 10);
 
-    const isJamMasuk = (jamWib >= 7 && jamWib < 8);
-    const isJamPulang = (jamWib >= 16 && jamWib < 17);
+      const qrLama = document.getElementById('qrHash').value;
 
-    // Jika di luar jam 07-08 dan 16-17, BERHENTI di sini (tidak ada request ke server)
-    if (!isJamMasuk && !isJamPulang) {
-        document.getElementById('qrHash').value = '';
-        updatePreviewQr();
-        return; 
-    }
-
-    // 2. Baru hubungi server jika memang sedang jam presensi
-    const targetUnitId = parseInt(val('qrUnitId')) || 31;
-    try {
-        const baseUrl = val('baseUrl').replace(/\/$/, '');
-        // Ubah menjadi seperti ini:
-const res = await fetch(`${baseUrl}/unit`, { headers: getHeaders(true) });
-        const json = await res.json();
-        const arr = Array.isArray(json) ? json : (json.data || []);
-        const unit = arr.find(u => parseInt(u.id) === targetUnitId);
-
-        if (unit) {
-            if (isJamMasuk && unit.qr_in) {
-                document.getElementById('qrHash').value = unit.qr_in;
-                log(`🔄 [OTOMATIS] QR Check-In (07-08 WIB): ${unit.qr_in}`);
-            } else if (isJamPulang && unit.qr_out) {
-                document.getElementById('qrHash').value = unit.qr_out;
-                log(`🔄 [OTOMATIS] QR Check-Out (16-17 WIB): ${unit.qr_out}`);
-            }
-            updatePreviewQr();
+      // Jadwal normal: 07:00-12:59 (In) dan 13:00-16:59 (Out)
+      if (jamWib >= 7 && jamWib < 8 && unit.qr_in) {
+        document.getElementById('qrHash').value = unit.qr_in;
+        if (qrLama !== unit.qr_in) {
+          log(`🔑 [SERVER TIME] QR Check-In (07-8 WIB) Unit ${targetUnitId}: ${unit.qr_in}`);
         }
-    } catch (e) {
-        log(`⚠️ Gagal sinkron QR otomatis: ${e.message}`);
+      } else if (jamWib >= 16 && jamWib < 17 && unit.qr_out) {
+        document.getElementById('qrHash').value = unit.qr_out;
+        if (qrLama !== unit.qr_out) {
+          log(`🔑 [SERVER TIME] QR Check-Out (16-17 WIB) Unit ${targetUnitId}: ${unit.qr_out}`);
+        }
+      } else {
+        if (qrLama !== '') {
+          document.getElementById('qrHash').value = '';
+          const jamMenitWib = new Intl.DateTimeFormat('id-ID', {
+            timeZone: 'Asia/Jakarta',
+            hour: '2-digit',
+            minute: '2-digit'
+          }).format(waktuAcuan);
+          log(`⏰[INFO] Di luar jam presensi 07:00-08:00 & 16:00-17:00 (Server: ${jamMenitWib} WIB).Token QR dikosongkan🙏.`);
+        }
+      }
+      updatePreviewQr();
     }
+  } catch (e) {
+    log(`⚠️ Gagal sinkron QR otomatis: ${e.message}`);
+  }
 }
 
-log('✅ [INFO] Di luar jam presensi 07-08 & 16-17 WIB)Token QR di tutup🙏');
 sinkronTanggalOtomatis();
-setInterval(sinkronTanggalOtomatis, 40000);
+
+// Tambahan: Cek dan perbarui token QR otomatis setiap 40 detik (40.000 ms)
+setInterval(() => {
+  sinkronTanggalOtomatis();
+}, 40000);
 
 function pakaiDeviceAndroid() {
     document.getElementById('deviceId').value = '40622cf44ad36bb1';
