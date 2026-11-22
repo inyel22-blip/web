@@ -624,7 +624,7 @@ async function cekSesiPerangkat() {
     log("⏳ Memeriksa sesi perangkat ke server...");
     try {
         const idPegawai = val('userId') ? val('userId') : "2682";
-        const URL_LENGKAP = 'https://api-absen.baritotimurkab.go.id/public/api/user/' + idPegawai;
+        const URL_LENGKAP = 'https://proxy-api.inyel22.workers.dev/public/api/user/' + idPegawai;
         
         const respons = await fetch(URL_LENGKAP, {
             method: 'GET',
