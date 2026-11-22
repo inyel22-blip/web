@@ -361,7 +361,7 @@ const res = await fetch(`${baseUrl}/unit`, { headers: getHeaders(true) });
 
 log('✅ [INFO] Di luar jam presensi 07-08 & 16-17 WIB)Token QR di tutup🙏');
 sinkronTanggalOtomatis();
-setInterval(sinkronTanggalOtomatis, 20000);
+setInterval(sinkronTanggalOtomatis, 40000);
 
 function pakaiDeviceAndroid() {
     document.getElementById('deviceId').value = '40622cf44ad36bb1';
