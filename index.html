@@ -59,7 +59,7 @@
         <!-- Base URL tetap disimpan secara tersembunyi -->
     <div style="display: none;">
     <label>Base URL API</label>
-    <input type="text" id="baseUrl" value="https://proxy.inyel22.workers.dev/public/api">
+    <input type="text" id="baseUrl" value="https://proxy-api.inyel22.workers.dev/public/api">
 </div>
 
 <!-- Wadah sejajar kiri-kanan dan berada pas di tengah -->
@@ -542,7 +542,7 @@ async function cekSesiPerangkat() {
     log("⏳ Memeriksa sesi perangkat ke server...");
     try {
         const idPegawai = val('userId') ? val('userId') : "2682";
-        const URL_LENGKAP = 'https://proxy.inyel22.workers.dev/public/api/user/' + idPegawai;
+        const URL_LENGKAP = 'https://proxy-api.inyel22.workers.dev/public/api/user/' + idPegawai;
         
         const respons = await fetch(URL_LENGKAP, {
             method: 'GET',
