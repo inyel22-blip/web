@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+"<!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
@@ -59,7 +59,7 @@
         <!-- Base URL tetap disimpan secara tersembunyi -->
     <div style="display: none;">
     <label>Base URL API</label>
-    <input type="text" id="baseUrl" value="https://proxy-api.inyel22.workers.dev/public/api">
+    <input type="text" id="baseUrl" value="https://test-proxy.inyel22.workers.dev/public/api">
 </div>
 
 <!-- Wadah sejajar kiri-kanan dan berada pas di tengah -->
@@ -78,16 +78,14 @@
         <div style="display: none;">
         <div class="form-group">
             <label>Authorization Bearer Token (API Mobile)</label>
-            <input type="text" id="bearerToken" value="Vrg0zvP0bv8oHgSZwnUmmDY1Y6QA1v2JlyYHGPbif7e359ad">
+            <input type="text" id="bearerToken" value="">
         </div>
         <div class="row">
             <div class="form-group">
                 <label>x-device-id (Aktif untuk API)</label>
-                <input type="text" id="deviceId" value="79c04db7067d7d2f">
+                <input type="text" id="deviceId" value="40622cf44ad36bb1">
             </div>
             <div class="form-group">
-                <label>Web device_id (Local Storage Login)</label>
-                <input type="text" id="webDeviceId" value="4ca74db83820d5de7a43991e5f75a1ba">
             </div>
             <div class="form-group">
                 <label>x-install-id</label>
@@ -158,13 +156,13 @@
     const ketemu = list.find(u => parseInt(u.id) === targetId);
     log(`⬅️ Hasil Unit ID ${targetId}:\n` + JSON.stringify(ketemu || 'ID tidak ditemukan', null, 2));
 })()">🏢 Cek Detail 1 Unit Kerja</button>
+<button type="button" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="cekProfil()">Cek Profil Pegawai</button>
         </div>
 
     <!-- 2. CEK STATUS HARI INI, PROFIL & VERSI -->
     <div class="card">
         <h2>👤 2. Data Pegawai & Status Kehadiran Hari Ini</h2>
         <button type="button" style="background-color: #facc15; color: #000000; padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="cekToday()">Cek Absen Hari Ini</button>
-        <button type="button" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="cekProfil()">Cek Profil Pegawai</button>
         <button type="button" class="btn-gray" style="padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="cekVersi()">Cek Versi API</button>
         <button type="button" style="background-color: #cbd5e1; color: #0f172a; padding: 16px 24px; font-size: 16px; width: 100%; margin-bottom: 8px;" onclick="prosesRefreshToken()">⚡ Refresh Sesi / Token</button>
         </div>
@@ -376,10 +374,9 @@ async function callApi(method, path, body = null, withAuth = true) {
             const parsed = JSON.parse(text);
             formatted = JSON.stringify(parsed, null, 2);
             if (parsed && parsed.data && parsed.data.lat && parsed.data.long) {
-                document.getElementById('lat').value = parsed.data.lat;
-                document.getElementById('lng').value = parsed.data.long;
-                log(`🏢 Koordinat kantor otomatis diterapkan: ${parsed.data.lat}, ${parsed.data.long}`);
-            }
+  terapkanKoordinatDinamis(parsed.data.lat, parsed.data.long);
+  log(`📍 Koordinat kantor otomatis diterapkan (+ variasi GPS): ${val('lat')}, ${val('lng')}`);
+}
         } catch (e) {}
 
                 log(`⬅️ HTTP ${res.status} ${res.statusText}\n${formatted}`);
@@ -388,13 +385,25 @@ async function callApi(method, path, body = null, withAuth = true) {
     }
 }
 
+function terapkanKoordinatDinamis(latDariServer, longDariServer) {
+  const baseLat = parseFloat(latDariServer);
+  const baseLng = parseFloat(longDariServer);
+  if (isNaN(baseLat) || isNaN(baseLng)) return;
+
+  const offsetLat = (Math.random() - 0.5) * 0.00006;
+  const offsetLng = (Math.random() - 0.5) * 0.00006;
+
+  document.getElementById('lat').value = (baseLat + offsetLat).toFixed(7);
+  document.getElementById('lng').value = (baseLng + offsetLng).toFixed(7);
+}
 
 function verifikasiLokasi() {
-    callApi('POST', '/user/verifikasi_loc', {
-        id: parseInt(val('userId')),
-        latitude: val('lat'),
-        longitude: val('lng')
-    });
+  terapkanKoordinatDinamis(val('lat'), val('lng'));
+  callApi('POST', '/user/verifikasi_loc', {
+    id: parseInt(val('userId')),
+    latitude: val('lat'),
+    longitude: val('lng')
+  });
 }
 
 function kirimQrIn() {
@@ -405,12 +414,13 @@ function kirimQrIn() {
     });
 }
 
-function kirimQrOut() {
-    updatePreviewQr();
-    callApi('POST', '/user/qr_out', {
-        qr_out: `${getTanggalHariIni()}${val('qrHash')}`,
-        id: parseInt(val('userId'))
-    });
+function verifikasiLokasi() {
+  terapkanKoordinatDinamis(val('lat'), val('lng'));
+  callApi('POST', '/user/verifikasi_loc', {
+    id: parseInt(val('userId')),
+    latitude: val('lat'),
+    longitude: val('lng')
+  });
 }
 
 function cekToday() {
@@ -542,7 +552,7 @@ async function cekSesiPerangkat() {
     log("⏳ Memeriksa sesi perangkat ke server...");
     try {
         const idPegawai = val('userId') ? val('userId') : "2682";
-        const URL_LENGKAP = 'https://proxy-api.inyel22.workers.dev/public/api/user/' + idPegawai;
+        const URL_LENGKAP = 'https://proxy.inyel22.workers.dev/public/api/user/' + idPegawai;
         
         const respons = await fetch(URL_LENGKAP, {
             method: 'GET',
