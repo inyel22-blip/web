@@ -75,28 +75,62 @@
             </div>
         </div>
         </div>
-        <div style="display: none;">
-        <div class="form-group">
-            <label>Authorization Bearer Token (API Mobile)</label>
-            <input type="text" id="bearerToken" value="">
-        </div>
-        <div class="row">
-            <div class="form-group">
-                <label>x-device-id (Aktif untuk API)</label>
-                <input type="text" id="deviceId" value="40622cf44ad36bb1">
-            </div>
-            <div class="form-group">
-            </div>
-            <div class="form-group">
-                <label>x-install-id</label>
-                <input type="text" id="installId" value="761392668472996190bfbe472b50c9b1626f413f41901ad8">
-            </div>
-        </div>
-        <button type="button" class="btn-gray" onclick="pakaiDeviceAndroid()">Gunakan Device ID Android</button>
-        <button type="button" class="btn-gray" onclick="pakaiDeviceWeb()">Gunakan Device ID Web</button>
-        <button type="button" class="btn-cyan" onclick="salinScriptConsole()">📋 Salin Script Ambil QR (Untuk Console Web)</button>
-    </div>
+          <!-- Input tersembunyi (sudah ditangani otomatis oleh Cloudflare Worker) -->
+  <div style="display: none;">
+    <input type="hidden" id="bearerToken" value="">
+    <input type="hidden" id="deviceId" value="">
+    <input type="hidden" id="installId" value="">
+  </div>
 
+  </div>
+</div>
+  <!-- Panel Update Token ke Cloudflare KV -->
+  <details style="margin-top: 12px; background: #16213e; border-radius: 8px; border: 1px solid #2a3a5e; padding: 10px;">
+    <summary style="font-size: 13px; font-weight: bold; color: #38bdf8; cursor: pointer; outline: none;">
+      🔄 Update Token Baru ke Server Proxy (KV)
+    </summary>
+    <div style="margin-top: 10px;">
+      <input type="text" id="newTokenInput" placeholder="Tempel Token Baru di sini..." 
+             style="width: 100%; padding: 8px; margin-bottom: 8px; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: #fff; box-sizing: border-box;">
+      <div style="display: flex; gap: 8px;">
+        <input type="password" id="adminPinInput" placeholder="PIN Admin" 
+               style="width: 35%; padding: 8px; border-radius: 6px; border: 1px solid #334155; background: #0f172a; color: #fff;">
+        <button type="button" onclick="updateTokenKV()" 
+                style="width: 65%; padding: 8px; border-radius: 6px; border: none; background: #10b981; color: #fff; font-weight: bold; cursor: pointer;">
+          Simpan Token Baru
+        </button>
+      </div>
+    </div>
+  </details>
+
+  <script>
+  async function updateTokenKV() {
+    const newToken = document.getElementById("newTokenInput").value.trim();
+    const pin = document.getElementById("adminPinInput").value.trim();
+    const proxyUrl = "https://workers.dev";
+
+    if (!newToken || !pin) {
+      alert("Isi Token Baru dan PIN Admin terlebih dahulu!");
+      return;
+    }
+
+    try {
+      const res = await fetch(proxyUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ pin: pin, token: newToken })
+      });
+      const data = await res.json();
+      alert(data.message);
+      if (data.status) {
+        document.getElementById("newTokenInput").value = "";
+        document.getElementById("adminPinInput").value = "";
+      }
+    } catch (err) {
+      alert("Gagal menghubungi Proxy: " + err.message);
+    }
+  }
+  </script>
     <!-- KONSOL LOG RESPON -->
     <div class="console-wrapper">
        <div class="console-header">
