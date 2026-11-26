@@ -46,7 +46,6 @@
 </head>
 <body>
 
-<div class="container">
     <h1>🛠 Dasbor ATEI BARTIM v11</h1>
     <div class="subtitle">
         💥: <code>inyel22@gmail.com 💫(by.inyel)💫</code> | 
@@ -72,8 +71,6 @@
         <label for="qrUnitId" style="display: block; margin-bottom: 5px;">ID Unit</label>
         <input type="number" id="qrUnitId" value="31" style="width: 120px; text-align: center;" onchange="sinkronTanggalOtomatis()">
     </div>
-            </div>
-        </div>
         </div>
           <!-- Input tersembunyi (sudah ditangani otomatis oleh Cloudflare Worker) -->
   <div style="display: none;">
@@ -81,9 +78,7 @@
     <input type="hidden" id="deviceId" value="">
     <input type="hidden" id="installId" value="">
   </div>
-
   </div>
-</div>
   <!-- Panel Update Token ke Cloudflare KV -->
   <details style="margin-top: 12px; background: #16213e; border-radius: 8px; border: 1px solid #2a3a5e; padding: 10px;">
     <summary style="font-size: 13px; font-weight: bold; color: #38bdf8; cursor: pointer; outline: none;">
@@ -230,10 +225,6 @@ function getTanggalHariIni() {
     return `${year}-${month}-${day}`;
 }
 
-function updateQrUrl() {
-    const unitId = val('qrUnitId') || '31';
-    document.getElementById('qrFullUrl').value = `https://presensi.baritotimurkab.go.id/get_qr/${unitId}`;
-}
 
 function updatePreviewQr() {
     const tglStr = getTanggalHariIni();
@@ -325,25 +316,6 @@ sinkronTanggalOtomatis();
 setInterval(() => {
   sinkronTanggalOtomatis();
 }, 40000);
-
-function pakaiDeviceAndroid() {
-    document.getElementById('deviceId').value = '40622cf44ad36bb1';
-    log('🔄 x-device-id diubah ke ID Android: 40622cf44ad36bb1');
-}
-
-function pakaiDeviceWeb() {
-    document.getElementById('deviceId').value = val('webDeviceId');
-    log(`🔄 x-device-id diubah ke ID Web: ${val('webDeviceId')}`);
-}
-
-function salinScriptConsole() {
-    const script = `fetch('/get_qr/${unitId}').then(r=>r.text()).then(t=>{const m=t.match(/\\d{4}-\\d{2}-\\d{2}[A-Za-z0-9]{8,20}/);const h=m?m[0]:t.trim();navigator.clipboard?.writeText(h);alert('Token QR Tersalin:\\n'+h);});`;
-    navigator.clipboard?.writeText(script);
-    log(`📋 Script Console tersalin ke clipboard!
-1. Buka tab presensi.baritotimurkab.go.id (setelah login)
-2. Tempel di DevTools Console lalu tekan Enter
-3. Kembali ke sini dan klik "Tempel Token QR dari Clipboard".`);
-}
 
 async function tempelQrClipboard() {
     try {
@@ -448,13 +420,12 @@ function kirimQrIn() {
     });
 }
 
-function verifikasiLokasi() {
-  terapkanKoordinatDinamis(val('lat'), val('lng'));
-  callApi('POST', '/user/verifikasi_loc', {
-    id: parseInt(val('userId')),
-    latitude: val('lat'),
-    longitude: val('lng')
-  });
+function kirimQrOut() {
+    updatePreviewQr();
+    callApi('POST', '/user/qr_out', {
+        qr_out: `${getTanggalHariIni()}${val('qrHash')}`,
+        id: parseInt(val('userId'))
+    });
 }
 
 function cekToday() {
@@ -586,7 +557,7 @@ async function cekSesiPerangkat() {
     log("⏳ Memeriksa sesi perangkat ke server...");
     try {
         const idPegawai = val('userId') ? val('userId') : "2682";
-        const URL_LENGKAP = 'https://proxy.inyel22.workers.dev/public/api/user/' + idPegawai;
+        const URL_LENGKAP = 'https://proxy.inyel22.workers.dev/api/user/' + idPegawai;
         
         const respons = await fetch(URL_LENGKAP, {
             method: 'GET',
